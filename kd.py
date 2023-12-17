@@ -239,7 +239,7 @@ class killdigest_cog(commands.Cog):
     @commands.command()
     async def provi(self, ctx):
         try:
-            a, b, _ = get({'order[date_killed]': 'desc','region': 'providence'})
+            a, b, _ = await get({'order[date_killed]': 'desc','region': 'providence'})
             await ctx.send(a)
             await ctx.send(b)
         except Exception as e:
@@ -249,8 +249,8 @@ class killdigest_cog(commands.Cog):
     @commands.command()
     async def hellkms(self, ctx):
         try:
-            d = get({'order[date_killed]': 'desc','constellation': 'NJU-QV'}) + '\n'
-            d += get({'order[date_killed]': 'desc','constellation': 'Basilisk'})
+            d = await get({'order[date_killed]': 'desc','constellation': 'NJU-QV'}) + '\n'
+            d += await get({'order[date_killed]': 'desc','constellation': 'Basilisk'})
             await ctx.send(d)
         except Exception as e:
             await ctx.send(str(e))
@@ -370,7 +370,7 @@ async def ppk_do(self, b, channel = None):
     end_date = start_date + timedelta(days=7)
     week = (start_date + timedelta(1)).isocalendar()[1]
     if (self.pd['week'] != week) or force:
-        a, b, _ = get({'order[date_killed]': 'desc','region': 'providence'})
+        a, b, _ = await get({'order[date_killed]': 'desc','region': 'providence'})
         txt = await self.getcorpdic(channel)
         for i in [a, b, *txt]:
             try:
@@ -381,7 +381,7 @@ async def ppk_do(self, b, channel = None):
         self.pd['week'] = week
         self.pd.sync()
 
-def get(c = {'order[date_killed]': 'desc','region': 'providence'}):
+async def get(c = {'order[date_killed]': 'desc','region': 'providence'}):
     if isinstance(c, list):
         o = chain([getdic(x) for x in c])
     else:
@@ -395,7 +395,7 @@ def get(c = {'order[date_killed]': 'desc','region': 'providence'}):
     isk = {}
     iskt = 0
     kms = []
-    for i in o:
+    async for i in o:
         if i['date_killed'] < start_date:
             new = 'less'
         elif i['date_killed'] > end_date:
