@@ -182,11 +182,13 @@ class killdigest_cog(commands.Cog):
                 if i['killer_corp'] == corp:
                     kills[kmk][corp].append(i)
                     if i['victim_ship_category'] in capclasses:
-                        capkills.append(i['image_url'])
+                        if i['isk'] > 10000000000:
+                            capkills.append(i['image_url'])
                 if i['victim_corp'] == corp:
                     losses[kmk][corp].append(i)
                     if i['victim_ship_category'] in capclasses:
-                        caplosses.append(i['image_url'])
+                        if i['isk'] > 10000000000:
+                            caplosses.append(i['image_url'])
         txt = ''
         headers = {'provi': 'domestic', 'ext': 'foreign'}
         msgs = []
