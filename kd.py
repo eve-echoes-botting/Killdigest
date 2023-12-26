@@ -247,7 +247,6 @@ class killdigest_cog(commands.Cog):
         except Exception as e:
             await ctx.send(traceback.format_exc())
 
-
     @commands.command()
     async def hellkms(self, ctx):
         try:
@@ -256,6 +255,19 @@ class killdigest_cog(commands.Cog):
             await ctx.send(d)
         except Exception as e:
             await ctx.send(str(e))
+
+    @commands.command()
+    async def y2k23(self, ctx, n):
+        o = getdic({'order[date_killed]': 'desc','killer_corp': n})
+        end_date = datetime.now(pytz.utc)
+        start_date = datetime.strptime('1-1-2023', '%d-%m-%Y')
+        d = {}
+        async for i in o:
+            p = i['killer_name']
+            if p not in d:
+                d[p] = 0
+            d[p] += 1
+        await ctx.send([f'{k}: {v}' for k, v in d.items()])
 
     @commands.command()
     async def plotkmregions(self, ctx, limit: int = 1):
