@@ -261,13 +261,28 @@ class killdigest_cog(commands.Cog):
         o = getdic({'order[date_killed]': 'desc','killer_corp': n})
         end_date = datetime.now(pytz.utc)
         start_date = datetime.strptime('1-1-2023', '%d-%m-%Y')
+        start_date = datetime(2023, 1, 1, 0, 0, 0, 0, pytz.utc)
         d = {}
+        isk = {}
+        onekiller = []
         async for i in o:
+            if i['date_killed'] < start_date:
+                break
             p = i['killer_name']
             if p not in d:
-                d[p] = 0
-            d[p] += 1
-        await ctx.send([f'{k}: {v}' for k, v in d.items()])
+                if p not in onekiller:
+                    onekiller.append(p)
+                else:
+                    onekiller.remove(p)
+                    d[p] = 2
+            else:
+                d[p] += 1
+            if p not in isk:
+                isk[p] = 0
+            isk[p] += float(i['isk'])
+        txt = '\n'.join([f'{k}: {v} / {iskf(isk[k])}' for k, v in sorted(d.items(), reverse = True, key = lambda x: x[1])])
+        txt += f'\none kill on those humans: {onekiller}'
+        await ctx.send(txt)
 
     @commands.command()
     async def plotkmregions(self, ctx, limit: int = 1):
@@ -317,7 +332,7 @@ class killdigest_cog(commands.Cog):
                 today = datetime.now(pytz.utc)
                 start_date = today - timedelta(days=today.weekday())
                 ret = {}
-                for i in o:
+                async for i in o:
                     n = int((start_date - i['date_killed']).days/7)
                     if n > limit:
                         break
@@ -341,7 +356,7 @@ class killdigest_cog(commands.Cog):
                     start_date = today - timedelta(days=today.weekday() + 7*wn)
                     end_date = start_date + timedelta(days=7*wn)
                 ret = {}
-                for i in o:
+                async for i in o:
                     if i['date_killed'] < start_date:
                         break
                     elif i['date_killed'] > end_date:
@@ -465,4 +480,6 @@ def generate_column_graph(d):
 
     return graph_file
 
+if __name__ == '__main__':
+    asyncio.run(y2k23(None, None, 'HELL'))
 
